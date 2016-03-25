@@ -1,0 +1,200 @@
+ocio_profile_version: 1
+
+search_path: luts
+strictparsing: true
+luma: [0.2126, 0.7152, 0.0722]
+
+description: Default Natron OCIO Configuration
+
+roles:
+  reference: Utility - Linear Color
+  scene_linear: Linear sRGB / REC.709 D65
+  default_byte: sRGB D65
+  default_float: Linear sRGB / REC.709 D65
+  chromaticity: XYZ D65 Aligned
+  color_picking: sRGB Curve
+  texture_paint: sRGB Curve
+
+displays:
+  sRGB / REC.709 Reference:
+    - !<View> {name: sRGB D65 View, colorspace: sRGB D65}
+    - !<View> {name: Rec 1886 D65 View, colorspace: Rec 1886 Curve}
+    - !<View> {name: Linear sRGB D65 View, colorspace: Utility - Linear Color}
+    - !<View> {name: Raw View, colorspace: Utility - Raw Data}
+
+  DCI-P3 Reference:
+    - !<View> {name: Apple iMac P3 (2015), colorspace: iMac P3 2015}
+
+active_displays: [sRGB / REC.709 Reference, DCI-P3 Reference]
+active_views: [sRGB D65 View, Apple iMac P3 (2015)]
+
+colorspaces:
+
+# Utilities - Utility definitions
+
+  - !<ColorSpace>
+    name: Utility - Raw Data
+    family: Utilities
+    equalitygroup:
+    bitdepth: 32f
+    isdata: true
+    allocation: uniform
+    allocationvars: [0, 1]
+
+  - !<ColorSpace>
+    name: Utility - Linear Color
+    family: Utilities
+    equalitygroup:
+    bitdepth: 32f
+    isdata: false
+    allocation: lg2
+    allocationvars: [-8, 5, 0.00390625]
+
+# Curves - Transfer curves
+
+  - !<ColorSpace>
+    name: sRGB Curve
+    family: Curves
+    equalitygroup:
+    bitdepth: 32f
+    description: |
+      sRGB transfer curve as outlined in IEC 61966-2-1:1999
+    isdata: false
+    allocation: uniform
+    allocationvars: [0, 1]
+    to_reference: !<FileTransform> {src: sRGB_to_linear.spi1d, interpolation: linear}
+
+  - !<ColorSpace>
+    name: AdobeRGB Compatible Curve
+    family: Curves
+    equalitygroup:
+    bitdepth: 32f
+    description: |
+      AdobeRGB compatible transfer curve as outlined in the Adobe RGB 1998 specification
+    isdata: false
+    allocation: uniform
+    allocationvars: [0, 1]
+    to_reference: !<FileTransform> {src: AdobeRGB_to_linear.spi1d, interpolation: linear}
+
+  - !<ColorSpace>
+    name: Josh Pines Log Curve
+    family: Curves
+    equalitygroup:
+    bitdepth: 32f
+    description: |
+      Josh Pines log curve
+    isdata: false
+    allocation: uniform
+    allocationvars: [0, 1]
+    to_reference: !<FileTransform> {src: JPLog_to_linear.spi1d, interpolation: linear}
+
+  - !<ColorSpace>
+    name: Cineon Log Curve
+    family: Curves
+    equalitygroup:
+    bitdepth: 32f
+    description: |
+      Cineon log curve
+    isdata: false
+    allocation: uniform
+    allocationvars: [0, 1]
+    to_reference: !<FileTransform> {src: CineonLog_to_linear.spi1d, interpolation: linear}
+
+  - !<ColorSpace>
+    name: Rec 1886 Curve
+    family: Curves
+    equalitygroup:
+    bitdepth: 32f
+    description: |
+      Rec 1886 curve
+    isdata: false
+    allocation: uniform
+    allocationvars: [0, 1]
+    to_reference: !<FileTransform> {src: rec1886_to_linear.spi1d, interpolation: linear}
+
+  - !<ColorSpace>
+    name: Rec 2020 12 Bit Curve
+    family: Curves
+    equalitygroup:
+    bitdepth: 32f
+    description: |
+      Rec 2020 12 bit curve
+    isdata: false
+    allocation: uniform
+    allocationvars: [0, 1]
+    to_reference: !<FileTransform> {src: rec2020_to_linear.spi1d, interpolation: linear}
+
+# Spaces - Fully defined spaces for transformations to and from
+
+  - !<ColorSpace>
+    name: Linear sRGB / REC.709 D65
+    family: Spaces
+    equalitygroup:
+    bitdepth: 32f
+    description: |
+      Scene linear reference with sRGB / REC.709 primaries
+    isdata: false
+    allocation: lg2
+    allocationvars: [-8, 5, 0.00390625]
+
+  - !<ColorSpace>
+    name: sRGB D65
+    family: Spaces
+    equalitygroup:
+    bitdepth: 32f
+    description: |
+      D65 sRGB space as outlined in IEC 61966-2-1:1999
+    isdata: false
+    allocation: lg2
+    allocationvars: [-8, 5, 0.00390625]
+    to_reference: !<ColorSpaceTransform> {src: sRGB Curve, dst: Linear sRGB / REC.709 D65}
+
+  - !<ColorSpace>
+    name: AdobeRGB D65 Compatible Space
+    family: Spaces
+    equalitygroup:
+    bitdepth: 32f
+    description: |
+      D65 AdobeRGB Compatible space as outlined in AdobeRGB (1998)
+    isdata: false
+    allocation: lg2
+    allocationvars: [-8, 5, 0.00390625]
+    to_reference: !<GroupTransform>
+      children:
+        - !<ColorSpaceTransform> {src: AdobeRGB Compatible Curve, dst: Utility - Linear Color}
+        - !<MatrixTransform> {matrix: [0.5767309, 0.1855540, 0.1881852, 0, 0.2973769, 0.6273491, 0.0752741, 0, 0.0270343, 0.0706872, 0.9911085, 0, 0, 0, 0, 1]}
+        - !<MatrixTransform> {matrix: [3.2404542, -1.5371385, -0.4985314, 0, -0.9692660,  1.8760108,  0.0415560, 0, 0.0556434, -0.2040259,  1.0572252, 0, 0, 0, 0, 1]}
+
+  - !<ColorSpace>
+    name: XYZ D65 Aligned
+    family: Spaces
+    equalitygroup:
+    bitdepth: 32f
+    description: |
+      XYZ space for D65 aligned imagery
+    isdata: false
+    allocation: lg2
+    allocationvars: [-8, 5, 0.00390625]
+    from_reference: !<GroupTransform>
+      children:
+        - !<MatrixTransform> {matrix: [3.2404542, -1.5371385, -0.4985314, 0, -0.9692660,  1.8760108,  0.0415560, 0, 0.0556434, -0.2040259,  1.0572252, 0, 0, 0, 0, 1], direction: inverse}
+
+# View Specific - Defined unique spaces strictly intended for Views
+
+  - !<ColorSpace>
+    name: iMac P3 2015
+    family: Views
+    equalitygroup:
+    bitdepth: 32f
+    description: |
+      D65 adapted Apple iMac P3 (Late 2015) viewing transform
+    isdata: false
+    allocation: uniform
+    allocationvars: [0, 1]
+    from_reference: !<GroupTransform>
+      children:
+        # D65 sRGB / 709 to XYZ
+        - !<MatrixTransform> {matrix: [0.4124564, 0.3575761, 0.1804375, 0, 0.2126729, 0.7151522, 0.0721750, 0, 0.0193339, 0.1191920, 0.9503041, 0, 0, 0, 0, 1]}
+        # D65 adapted Apple iMac P3 2015 display values from iMac-6A1DEB9C-A7E7-8C4E-CE47-54E72748140C.icc, version 2.1
+        - !<MatrixTransform> {matrix: [0.514249755, 0.296957726, 0.153966662, 0, 0.241055729, 0.702699696, 0.056275514, 0, -0.001057978, 0.042403951, 0.783408022, 0, 0, 0, 0, 1], direction: inverse}
+        - !<ColorSpaceTransform> {src: Utility - Linear Color, dst: sRGB Curve}
