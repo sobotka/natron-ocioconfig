@@ -82,7 +82,7 @@ colorspaces:
     equalitygroup:
     bitdepth: 32f
     description: |
-      Josh Pines log curve
+      Josh Pines log curve as outlined at http://osdir.com/ml/video.openexr.devel/2005-03/msg00006.html
     isdata: false
     allocation: uniform
     allocationvars: [0, 1]
@@ -94,7 +94,7 @@ colorspaces:
     equalitygroup:
     bitdepth: 32f
     description: |
-      Cineon log curve
+      Cineon log curve as outlined at http://www.dotcsw.com/doc/cineon1.pdf
     isdata: false
     allocation: uniform
     allocationvars: [0, 1]
@@ -106,7 +106,7 @@ colorspaces:
     equalitygroup:
     bitdepth: 32f
     description: |
-      Rec 1886 curve
+      Rec 1886 curve as outlined in the ITU-R BT.1886 specification
     isdata: false
     allocation: uniform
     allocationvars: [0, 1]
@@ -118,7 +118,19 @@ colorspaces:
     equalitygroup:
     bitdepth: 32f
     description: |
-      Rec 2020 12 bit curve
+      Rec 2020 12 bit curve as outlined in the ITU-R BT.1120-8 specification
+    isdata: false
+    allocation: uniform
+    allocationvars: [0, 1]
+    to_reference: !<FileTransform> {src: rec2020_to_linear.spi1d, interpolation: linear}
+
+  - !<ColorSpace>
+    name: Rec 709 Curve
+    family: Curves
+    equalitygroup:
+    bitdepth: 32f
+    description: |
+      Rec 709 encoding curve as outlined in the ITU-R BT.709-5 specification
     isdata: false
     allocation: uniform
     allocationvars: [0, 1]
