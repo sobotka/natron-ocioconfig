@@ -193,6 +193,8 @@ colorspaces:
 
 # View Specific - Defined unique spaces strictly intended for Views
 
+# This transform desperately needs testing. In theory, an sRGB display rendering out identical content
+# should look identical on an Apple P3 display, assuming sRGB display is also D65 white point.
   - !<ColorSpace>
     name: iMac P3 2015
     family: Views
@@ -205,8 +207,11 @@ colorspaces:
     allocationvars: [0, 1]
     from_reference: !<GroupTransform>
       children:
-        # D65 sRGB / 709 to XYZ
-        - !<MatrixTransform> {matrix: [0.4124564, 0.3575761, 0.1804375, 0, 0.2126729, 0.7151522, 0.0721750, 0, 0.0193339, 0.1191920, 0.9503041, 0, 0, 0, 0, 1]}
-        # D65 adapted Apple iMac P3 2015 display values from iMac-6A1DEB9C-A7E7-8C4E-CE47-54E72748140C.icc, version 2.1
-        - !<MatrixTransform> {matrix: [0.514249755, 0.296957726, 0.153966662, 0, 0.241055729, 0.702699696, 0.056275514, 0, -0.001057978, 0.042403951, 0.783408022, 0, 0, 0, 0, 1], direction: inverse}
+        # D65 sRGB / 709 to XYZ, normalized to preserve white point.
+        - !<MatrixTransform> {matrix: [0.433887, 0.376224, 0.189889, 0.0, 0.212639, 0.715169, 0.0721923, 0.0, 0.01775, 0.109448, 0.872802, 0.0, 0.0, 0.0, 0.0, 1.0]}
+        # Apple P3 D65 XYZ to RGB. These are adapted values, with a normalized matrix to preserve white point.
+        # They are taken from the iMac ICC, iMac-A7B96997-A225-ECFB-0501-11A19B2BADCC.icc
+        # MD5 b9df39c23521f651665de5668808cf82
+        # The values are based off of the hexadecimal calculated decimal values, adapted from ICC D50 to D65.
+        - !<MatrixTransform> {matrix: [2.09228, -0.747492, -0.34479, 0.0, -0.859493, 1.81975, 0.0397476, 0.0, 0.0388772, -0.0814796, 1.0426, 0.0, 0.0, 0.0, 0.0, 1.0]}
         - !<ColorSpaceTransform> {src: Utility - Linear Color, dst: sRGB Curve}
